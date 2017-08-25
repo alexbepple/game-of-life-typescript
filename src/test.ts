@@ -2,7 +2,10 @@ import {assertThat, is} from 'hamjest'
 import 'mocha'
 import r = require('ramda')
 
-const emptyGrid = []
+type Coord = [number, number]
+type Grid = Array<Coord>
+
+const emptyGrid: Grid = []
 const evolve = r.always(emptyGrid)
 
 describe('Next generation of', () => {
@@ -13,7 +16,7 @@ describe('Next generation of', () => {
   })
   describe('grid with one live cell', () => {
     it('is empty grid', () => {
-      const gridWithOneLiveCell = [[0,0]]
+      const gridWithOneLiveCell: Grid = [[0,0]]
       assertThat(evolve(gridWithOneLiveCell), is(emptyGrid))
     })
   })
