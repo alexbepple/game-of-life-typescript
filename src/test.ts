@@ -9,8 +9,11 @@ const emptyGrid: Grid = []
 const coord = (x, y) => <Coord>[x, y]
 const setLive = r.append
 const setAllLive = r.concat
+
+const shallDie = r.curry((coord, grid) => r.length(grid) === 1)
+
 const evolve = (grid: Grid) => {
-  const cellsToDie = r.length(grid) === 1 ? [coord(0, 0)] : []
+  const cellsToDie = r.filter(shallDie(r.__, grid), grid)
   return r.difference(grid, cellsToDie)
 }
 
