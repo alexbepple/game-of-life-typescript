@@ -10,8 +10,8 @@ const coord = (x, y) => <Coord>[x, y]
 const setLive = r.append
 const setAllLive = r.concat
 const evolve = (grid: Grid) => {
-  if (r.length(grid) === 4) return grid
-  return emptyGrid
+  const cellsToDie = r.length(grid) === 1 ? [coord(0, 0)] : []
+  return r.difference(grid, cellsToDie)
 }
 
 describe('Next generation of', () => {
