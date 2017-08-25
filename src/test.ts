@@ -6,6 +6,8 @@ type Coord = [number, number]
 type Grid = Array<Coord>
 
 const emptyGrid: Grid = []
+const coord = (x, y) => <Coord>[x, y]
+const add = r.append
 const evolve = (grid: Grid) => emptyGrid
 
 describe('Next generation of', () => {
@@ -16,7 +18,7 @@ describe('Next generation of', () => {
   })
   describe('grid with one live cell', () => {
     it('is empty grid', () => {
-      const gridWithOneLiveCell: Grid = [[0,0]]
+      const gridWithOneLiveCell = add(coord(0, 0), emptyGrid)
       assertThat(evolve(gridWithOneLiveCell), is(emptyGrid))
     })
   })
