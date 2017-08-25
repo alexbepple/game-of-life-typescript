@@ -1,9 +1,14 @@
 import {assertThat, is} from 'hamjest'
 import 'mocha'
+import r = require('ramda')
 
-describe('foo', () => {
-  it('bar', () => {
-    assertThat(1+1, is(3))
+const evolve = r.identity
+
+describe('Next generation of', () => {
+  describe('empty grid', () => {
+    it('is empty grid', () => {
+      const emptyGrid = []
+      assertThat(evolve(emptyGrid), is(emptyGrid))
+    })
   })
 })
-
