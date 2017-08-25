@@ -1,4 +1,4 @@
-import {assertThat, is} from 'hamjest'
+import {assertThat, is, hasSize} from 'hamjest'
 import 'mocha'
 import r = require('ramda')
 
@@ -10,8 +10,21 @@ const coord = (x, y) => <Coord>[x, y]
 const setLive = r.append
 const setAllLive = r.concat
 
-const shallDie = r.curry((coord, grid) => r.length(grid) === 1)
+const isAlive = r.contains
+const getNeighborhood = (coord) => {
+  const x = r.head(coord)
+  const y = r.last(coord)
+  return r.difference(r.xprod(r.range(x-1, x+2), r.range(y-1, y+2)), [coord])
+}
+const countAliveCellsInNeighborhood = (coord, grid) => r.compose(
+  r.length,
+  r.filter(isAlive(r.__, grid)),
+  getNeighborhood
+)(coord)
 
+const shallDie = r.curry((coord, grid) => {
+  return r.lte(countAliveCellsInNeighborhood(coord, grid), 1)
+})
 const evolve = (grid: Grid) => {
   const cellsToDie = r.filter(shallDie(r.__, grid), grid)
   return r.difference(grid, cellsToDie)
@@ -33,5 +46,16 @@ describe('Next generation of', () => {
       coord(1, 1)
     ])(emptyGrid)
     assertThat(evolve(block), is(block))
+  })
+})
+
+describe('Cell in grid', () => {
+  it('can be alive', () => {
+    const gridWithOneLiveCell = setLive(coord(0,0))(emptyGrid)
+    assertThat(isAlive(coord(0, 0), gridWithOneLiveCell), is(true))
+    assertThat(isAlive(coord(0, 0), emptyGrid), is(false))
+  })
+  it('has a neighborhood', () => {
+    assertThat(getNeighborhood(coord(0, 0)), hasSize(8))
   })
 })
