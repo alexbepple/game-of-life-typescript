@@ -21,10 +21,11 @@ const countAliveCellsInNeighborhood = (coord, grid) => r.compose(
   r.filter(isAlive(r.__, grid)),
   getNeighborhood
 )(coord)
-const doesCellStarve = r.lte(r.__, 1)
+const diesOfUnderpopulation = r.lte(r.__, 1)
+const diesOfOverpopulation = r.gte(r.__, 4)
 const shallDie = r.curry(r.binary(r.pipe(
   countAliveCellsInNeighborhood,
-  doesCellStarve
+  r.either(diesOfUnderpopulation, diesOfOverpopulation)
 )))
 const evolve = (grid: Grid) => {
   const cellsToDie = r.filter(shallDie(r.__, grid), grid)
@@ -58,5 +59,17 @@ describe('Cell in grid', () => {
   })
   it('has a neighborhood', () => {
     assertThat(getNeighborhood(coord(0, 0)), hasSize(8))
+  })
+  it('dies of starvation', () => {
+    const grid = setAllLive([coord(0, 0), coord(0, 1)])(emptyGrid)
+    assertThat(shallDie(coord(0, 0), grid), is(true))
+  })
+  it('dies of overpopulation', () => {
+    const grid = setAllLive([coord(0, 0), coord(1, 0), coord(0, 1), coord(1, 1), coord(2, 1)])(emptyGrid)
+    assertThat(shallDie(coord(1, 0), grid), is(true))
+  })
+  it('stays alive otherwise', () => {
+    const grid = setAllLive([coord(0, 0), coord(0, 1), coord(0, 2)])(emptyGrid)
+    assertThat(shallDie(coord(0, 1), grid), is(false))
   })
 })
