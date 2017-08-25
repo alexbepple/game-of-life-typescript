@@ -6,7 +6,7 @@ type Coord = [number, number]
 type Grid = Array<Coord>
 
 const emptyGrid: Grid = []
-const evolve = r.always(emptyGrid)
+const evolve = (grid: Grid) => emptyGrid
 
 describe('Next generation of', () => {
   describe('empty grid', () => {

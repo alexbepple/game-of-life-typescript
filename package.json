@@ -9,5 +9,8 @@
     "ramda": "^0.24.1",
     "ts-node": "^3.3.0",
     "typescript": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/ramda": "types/npm-ramda#dist"
   }
 }
