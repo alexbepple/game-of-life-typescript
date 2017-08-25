@@ -21,10 +21,11 @@ const countAliveCellsInNeighborhood = (coord, grid) => r.compose(
   r.filter(isAlive(r.__, grid)),
   getNeighborhood
 )(coord)
-
-const shallDie = r.curry((coord, grid) => {
-  return r.lte(countAliveCellsInNeighborhood(coord, grid), 1)
-})
+const doesCellStarve = r.lte(r.__, 1)
+const shallDie = r.curry(r.binary(r.pipe(
+  countAliveCellsInNeighborhood,
+  doesCellStarve
+)))
 const evolve = (grid: Grid) => {
   const cellsToDie = r.filter(shallDie(r.__, grid), grid)
   return r.difference(grid, cellsToDie)
