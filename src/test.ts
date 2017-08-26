@@ -38,7 +38,7 @@ const evolve = (grid: Grid) => {
   const cellsToDie = r.filter(shallDie(r.__, grid), grid)
   const cellsThatMightBeBorn = r.uniq(r.chain(getNeighborhood, grid))
   const bornCells = r.filter(shallBeBorn(r.__, grid), cellsThatMightBeBorn)
-  return r.union(bornCells)(r.difference(grid, cellsToDie))
+  return r.compose(r.union(bornCells), (r.difference(r.__, cellsToDie)))(grid)
 }
 
 describe('Next generation of', () => {
