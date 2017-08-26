@@ -9,6 +9,7 @@ const emptyGrid: Grid = []
 const coord = (x, y) => <Coord>[x, y]
 const setLive = r.append
 const setAllLive = r.concat
+const createGrid = setAllLive(r.__, emptyGrid)
 
 const isAlive = r.contains
 const getNeighborhood = (coord) => {
@@ -37,39 +38,34 @@ describe('Next generation of', () => {
     assertThat(evolve(emptyGrid), is(emptyGrid))
   })
   it('grid with one live cell is empty grid', () => {
-    const gridWithOneLiveCell = setLive(coord(0, 0), emptyGrid)
+    const gridWithOneLiveCell = createGrid([coord(0, 0)])
     assertThat(evolve(gridWithOneLiveCell), is(emptyGrid))
   })
   it('block is block', () => {
-    const block = setAllLive([
-      coord(0, 0),
-      coord(0, 1),
-      coord(1, 0),
-      coord(1, 1)
-    ])(emptyGrid)
+    const block = createGrid([coord(0, 0), coord(0, 1), coord(1, 0), coord(1, 1)])
     assertThat(evolve(block), is(block))
   })
 })
 
 describe('Cell in grid', () => {
   it('can be alive', () => {
-    const gridWithOneLiveCell = setLive(coord(0,0))(emptyGrid)
-    assertThat(isAlive(coord(0, 0), gridWithOneLiveCell), is(true))
+    const grid = createGrid([coord(0,0)])
+    assertThat(isAlive(coord(0, 0), grid), is(true))
     assertThat(isAlive(coord(0, 0), emptyGrid), is(false))
   })
   it('has a neighborhood', () => {
     assertThat(getNeighborhood(coord(0, 0)), hasSize(8))
   })
   it('dies of starvation', () => {
-    const grid = setAllLive([coord(0, 0), coord(0, 1)])(emptyGrid)
+    const grid = createGrid([coord(0, 0), coord(0, 1)])
     assertThat(shallDie(coord(0, 0), grid), is(true))
   })
   it('dies of overpopulation', () => {
-    const grid = setAllLive([coord(0, 0), coord(1, 0), coord(0, 1), coord(1, 1), coord(2, 1)])(emptyGrid)
+    const grid = createGrid([coord(0, 0), coord(1, 0), coord(0, 1), coord(1, 1), coord(2, 1)])
     assertThat(shallDie(coord(1, 0), grid), is(true))
   })
   it('stays alive otherwise', () => {
-    const grid = setAllLive([coord(0, 0), coord(0, 1), coord(0, 2)])(emptyGrid)
+    const grid = createGrid([coord(0, 0), coord(0, 1), coord(0, 2)])
     assertThat(shallDie(coord(0, 1), grid), is(false))
   })
 })
