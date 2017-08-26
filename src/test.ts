@@ -24,16 +24,16 @@ const countAliveCellsInNeighborhood = (coord, grid) => r.compose(
   r.filter(isAlive(r.__, grid)),
   getNeighborhood
 )(coord)
-const diesOfUnderpopulation = r.lte(r.__, 1)
-const diesOfOverpopulation = r.gte(r.__, 4)
-const shallDie = r.curry(r.binary(r.pipe(
-  countAliveCellsInNeighborhood,
-  r.either(diesOfUnderpopulation, diesOfOverpopulation)
-)))
-const shallBeBorn = r.curry(r.binary(r.pipe(
-  countAliveCellsInNeighborhood,
-  r.equals(3)
-)))
+
+const neighborhoodSatisfies = r.curry((pred, coord, grid) => pred(countAliveCellsInNeighborhood(coord, grid)))
+
+const isUnderpopulated = r.lte(r.__, 1)
+const isOverpopulated = r.gte(r.__, 4)
+const shallDie = neighborhoodSatisfies(r.either(isUnderpopulated, isOverpopulated))
+
+const reproduces = r.equals(3)
+const shallBeBorn = neighborhoodSatisfies(reproduces)
+
 const evolve = (grid: Grid) => {
   const cellsToDie = r.filter(shallDie(r.__, grid), grid)
   const cellsThatMightBeBorn = r.uniq(r.chain(getNeighborhood, grid))
