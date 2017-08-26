@@ -12,6 +12,8 @@ const setAllLive = r.concat
 const createGrid = setAllLive(r.__, emptyGrid)
 
 const isAlive = r.contains
+const eq = r.binary(r.compose(r.isEmpty, r.difference))
+
 const getNeighborhood = (coord) => {
   const x = r.head(coord)
   const y = r.last(coord)
@@ -28,9 +30,15 @@ const shallDie = r.curry(r.binary(r.pipe(
   countAliveCellsInNeighborhood,
   r.either(diesOfUnderpopulation, diesOfOverpopulation)
 )))
+const shallBeBorn = r.curry(r.binary(r.pipe(
+  countAliveCellsInNeighborhood,
+  r.equals(3)
+)))
 const evolve = (grid: Grid) => {
   const cellsToDie = r.filter(shallDie(r.__, grid), grid)
-  return r.difference(grid, cellsToDie)
+  const cellsThatMightBeBorn = r.uniq(r.chain(getNeighborhood, grid))
+  const bornCells = r.filter(shallBeBorn(r.__, grid), cellsThatMightBeBorn)
+  return r.union(bornCells)(r.difference(grid, cellsToDie))
 }
 
 describe('Next generation of', () => {
@@ -43,7 +51,20 @@ describe('Next generation of', () => {
   })
   it('block is block', () => {
     const block = createGrid([coord(0, 0), coord(0, 1), coord(1, 0), coord(1, 1)])
-    assertThat(evolve(block), is(block))
+    assertThat(eq(evolve(block), block), is(true))
+  })
+  it('vertical blinker is horizontal blinker', () => {
+    const verticalBlinker = createGrid([coord(0, 0), coord(0, 1), coord(0, 2)])
+    const horizontalBlinker = createGrid([coord(-1, 1), coord(0, 1), coord(1, 1)])
+    assertThat(eq(evolve(verticalBlinker), horizontalBlinker), is(true))
+  })
+})
+
+describe('Grid', () => {
+  it('equals another grid by live cells', () => {
+    const grid = createGrid([coord(0, 0), coord(0, 1)])
+    const sameGridDifferentOrder = createGrid([coord(0, 1), coord(0, 0)])
+    assertThat(eq(grid, sameGridDifferentOrder), is(true))
   })
 })
 
